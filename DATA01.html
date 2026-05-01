@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=400, initial-scale=1.0">
+    <title>3DS New Tab</title>
+    <style>
+        body {
+            background-color: #202124; /* Chromeのダークモード風の背景色 */
+            color: #e8eaed;
+            font-family: sans-serif;
+            margin: 0;
+            padding: 16px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 1.2rem;
+            color: #8ab4f8;
+            margin-top: 40px;
+            margin-bottom: 24px;
+        }
+        /* 検索フォーム */
+        .search-box {
+            background: #303134;
+            border: 1px solid #5f6368;
+            border-radius: 24px;
+            padding: 10px 16px;
+            width: 85%;
+            max-width: 340px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+        }
+        .search-input {
+            background: transparent;
+            border: none;
+            color: #e8eaed;
+            font-size: 1rem;
+            width: 100%;
+            outline: none;
+        }
+        /* ショートカットアイコンエリア */
+        .shortcuts {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 40px;
+        }
+        .shortcut-item {
+            background: #303134;
+            width: 72px;
+            height: 72px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #e8eaed;
+            font-size: 0.75rem;
+            border: 1px solid #5f6368;
+        }
+        .shortcut-icon {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Yahoo! Search</h1>
+
+    <form action="https://search.yahoo.co.jp/search" method="GET">
+        <div class="search-box">
+            <input type="text" name="p" class="search-input" placeholder="Yahoo! で検索" autocomplete="off">
+        </div>
+        <input type="hidden" name="ei" value="UTF-8">
+    </form>
+
+    <div class="shortcuts">
+        <a href="http://yahoo.co.jp" class="shortcut-item">
+            <div class="shortcut-icon">🌐</div>
+            <span>Yahoo!</span>
+        </a>
+        <a href="http://google.com" class="shortcut-item">
+            <div class="shortcut-icon">🔍</div>
+            <span>Google</span>
+        </a>
+        <a href="#" class="shortcut-item" onclick="window.location.reload();">
+            <div class="shortcut-icon">🔄</div>
+            <span>更新</span>
+        </a>
+    </div>
+
+</body>
+</html>

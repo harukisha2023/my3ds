@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>3DS 2D RPG Field</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000000; /* 真っ黒にして余計な要素を排除 */
+            color: #ffffff;
+            font-family: monospace; /* レトロRPG風のフォント */
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        #game-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            padding: 8px;
+        }
+
+        /* ドット絵RPG風のフィールド（黒背景に白・緑などのシンプルなドット世界） */
+        #field {
+            position: relative;
+            width: 380px;
+            height: 150px;
+            background-color: #000000;
+            border: 2px solid #ffffff;
+            box-sizing: border-box;
+        }
+
+        /* プレイヤーキャラクター（ドット風の丸型アイコン） */
+        #player {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 0 4px #ffffff;
+            transition: top 0.08s linear, left 0.08s linear;
+        }
+
+        /* フィールド上のオブジェクト（木や街など） */
+        .tree {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border: 2px solid #ffffff;
+            box-sizing: border-box;
+        }
+
+        /* テキストメッセージエリア */
+        #message {
+            font-size: 0.85rem;
+            color: #ffffff;
+            text-align: center;
+            width: 100%;
+            height: 32px;
+            line-height: 1.2;
+        }
+
+        /* タッチ操作用パネル（枠線や色を減らし、最低限の表示に） */
+        .controls {
+            display: grid;
+            grid-template-columns: 70px 70px 70px;
+            grid-template-rows: 44px 44px;
+            gap: 6px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .btn {
+            background-color: #000000;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            height: 100%;
+        }
+
+        .btn:active {
+            background-color: #ffffff;
+            color: #000000;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="field">
+            <div id="player"></div>
+            <div class="tree" style="top: 48px; left: 120px;"></div>
+            <div class="tree" style="top: 48px; left: 144px;"></div>
+            <div class="tree" style="top: 72px; left: 240px;"></div>
+            <div class="tree" style="top: 96px; left: 80px;"></div>
+        </div>
+
+        <div id="message">フィールドを探索しよう</div>
+
+        <div class="controls">
+            <div></div>
+            <button class="btn" onclick="move('up')">↑</button>
+            <div></div>
+            <button class="btn" onclick="move('left')">←</button>
+            <button class="btn" onclick="move('down')">↓</button>
+            <button class="btn" onclick="move('right')">→</button>
+        </div>
+    </div>
+
+    <script>
+        const player = document.getElementById('player');
+        const message = document.getElementById('message');
+        const field = document.getElementById('field');
+        
+        let posX = 160;
+        let posY = 70;
+
+        player.style.left = posX + 'px';
+        player.style.top = posY + 'px';
+
+        // 障害物の位置とサイズ
+        const obstacles = [
+            { x: 120, y: 48, w: 24, h: 24 },
+            { x: 144, y: 48, w: 24, h: 24 },
+            { x: 240, y: 72, w: 24, h: 24 },
+            { x: 96, y: 96, w: 24, h: 24 } // ※ 画面上の位置と合わせて調整
+        ];
+
+        // メッセージリスト
+        const mapMessages = {
+            "default": "フィールドを探索しよう",
+            "tree": "木が邪魔で進めないようだ",
+            "shrine": "古い祠がある。何かが眠っているようだ……"
+        };
+
+        function move(direction) {
+            const speed = 24; // ドット単位の移動
+            let nextX = posX;
+            let nextY = posY;
+
+            if (direction === 'up') {
+                nextY -= speed;
+            } else if (direction === 'down') {
+                nextY += speed;
+            } else if (direction === 'left') {
+                nextX -= speed;
+            } else if (direction === 'right') {
+                nextX += speed;
+            }
+
+            // フィールドの境界線（外枠）チェック
+            if (nextX < 0 || nextX > 356 || nextY < 0 || nextY > 126) {
+                message.innerText = "これ以上は進めない。";
+                return;
+            }
+
+            // 障害物（木）との接触判定
+            let hit = false;
+            obstacles.forEach(obs => {
+                if (nextX < obs.x + obs.w && nextX + 24 > obs.x &&
+                    nextY < obs.y + obs.h && nextY + 24 > obs.y) {
+                    hit = true;
+                }
+            });
+
+            if (hit) {
+                message.innerText = mapMessages["tree"];
+            } else {
+                posX = nextX;
+                posY = nextY;
+                player.style.left = posX + 'px';
+                player.style.top = posY + 'px';
+                message.innerText = `X: ${Math.floor(posX/24)} / Y: ${Math.floor(posY/24)} を探索中`;
+            }
+        }
+    </script>
+</body>
+</html>
